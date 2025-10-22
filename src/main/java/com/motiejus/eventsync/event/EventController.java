@@ -2,6 +2,7 @@ package com.motiejus.eventsync.event;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,12 +11,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/events")
+@RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
-
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
-    }
 
     @Operation(summary = "Create event")
     @PostMapping

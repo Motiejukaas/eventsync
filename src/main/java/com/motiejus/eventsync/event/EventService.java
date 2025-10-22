@@ -1,17 +1,15 @@
 package com.motiejus.eventsync.event;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
-
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
 
     public EventResponseDTO createEvent(EventRequestDTO eventRequestDTO) {
         Event event = mapToEntity(eventRequestDTO);
