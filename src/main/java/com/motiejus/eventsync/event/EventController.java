@@ -1,5 +1,8 @@
 package com.motiejus.eventsync.event;
 
+import com.motiejus.eventsync.feedback.FeedbackRequestDTO;
+import com.motiejus.eventsync.feedback.FeedbackResponseDTO;
+import com.motiejus.eventsync.feedback.FeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,12 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
+    private final FeedbackService feedbackService;
 
     @Operation(summary = "Create event")
     @PostMapping
@@ -29,5 +34,18 @@ public class EventController {
         List<EventResponseDTO> events = eventService.getEvents();
 
         return ResponseEntity.status(HttpStatus.OK).body(events);
+    }
+
+    @Operation(summary = "Submit feedback")
+    @PostMapping("/{eventId}/feedback")
+    public ResponseEntity<FeedbackResponseDTO> submitFeedback(@RequestBody @Valid FeedbackRequestDTO feedbackRequestDTO, @PathVariable UUID eventId) {
+        FeedbackResponseDTO feedbackResponseDTO = feedbackService.createFeedback(feedbackRequestDTO, eventId);
+        return ResponseEntity.status(HttpStatus.OK).body(feedbackResponseDTO);
+    }
+
+    @Operation(summary = "Get sentiment breakdown")
+    @GetMapping("/{eventId}/summary")
+    public ResponseEntity<FeedbackResponseDTO> getSentimentBreakdown(@PathVariable UUID eventId) {
+        return null;
     }
 }

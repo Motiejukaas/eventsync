@@ -6,11 +6,10 @@ import lombok.Data;
 
 @Data
 public class EventRequestDTO {
-    @NotBlank
-    @Size(min = 1, max = 1000, message = "Event title must not be empty or exceed 1000 characters.")
+    @NotBlank(message = "Event title must not be empty")
+    @Size(max = 1000, message = "Event title must not exceed 1000 characters.")
     private String title;
 
-    @NotBlank
-    @Size(min = 1, message = "Event description must not be empty.")
+    @NotBlank(message = "Event description must not be empty.")
     private String description;
 }

@@ -21,4 +21,7 @@ public class Event {
 
     @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "sentiment")
+    private String sentiment;
 }
