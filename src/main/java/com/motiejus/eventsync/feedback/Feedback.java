@@ -21,6 +21,9 @@ public class Feedback {
     @Column(name = "message")
     private String message;
 
+    @Column(name = "sentiment")
+    private String sentiment;
+
     @Column(name = "created_at",  updatable = false, nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

@@ -9,9 +9,6 @@ import java.util.UUID;
 
 @Data
 public class FeedbackRequestDTO {
-    @NotNull(message = "Event ID is required.")
-    private UUID eventId;
-
     @NotBlank(message = "Feedback message must not be empty.")
     @Size(min = 10, message = "Feedback message must not be empty or exceed 1000 characters.")
     private String message;
