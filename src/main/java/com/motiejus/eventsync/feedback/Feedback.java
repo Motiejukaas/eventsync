@@ -1,5 +1,6 @@
 package com.motiejus.eventsync.feedback;
 
+import com.motiejus.eventsync.common.enums.SentimentType;
 import com.motiejus.eventsync.event.Event;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class Feedback {
     private String message;
 
     @Column(name = "sentiment")
-    private String sentiment;
+    private SentimentType sentiment;
 
     @Column(name = "created_at",  updatable = false, nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

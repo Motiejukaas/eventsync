@@ -43,6 +43,10 @@ public class EventService {
         eventResponseDTO.setId(event.getId());
         eventResponseDTO.setTitle(event.getTitle());
         eventResponseDTO.setDescription(event.getDescription());
+        eventResponseDTO.setPositiveFeedbackSentimentCount(event.getPositiveFeedbackSentimentCount());
+        eventResponseDTO.setNeutralFeedbackSentimentCount(event.getNeutralFeedbackSentimentCount());
+        eventResponseDTO.setNegativeFeedbackSentimentCount(event.getNegativeFeedbackSentimentCount());
+        eventResponseDTO.setFeedbackSentimentSummary(event.getFeedbackSentimentSummary());
         return eventResponseDTO;
     }
 }

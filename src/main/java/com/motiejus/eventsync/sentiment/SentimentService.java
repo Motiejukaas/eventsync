@@ -2,6 +2,7 @@ package com.motiejus.eventsync.sentiment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.motiejus.eventsync.common.enums.SentimentType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class SentimentService {
         this.objectMapper = objectMapper;
     }
 
-    public String analyzeSentiment(String text) {
+    public SentimentType analyzeSentiment(String text) {
         try {
             Map<String, Object> payload = Map.of("inputs", text);
             String requestBody = objectMapper.writeValueAsString(payload);
@@ -47,7 +48,7 @@ public class SentimentService {
 
             JsonNode root = objectMapper.readTree(response.body());
 
-            return root.get(0).get(0).get("label").asText();
+            return SentimentType.valueOf(root.get(0).get(0).get("label").asText().toUpperCase());
         } catch (Exception e) {
             throw new RuntimeException("Sentiment analysis failed", e);
         }

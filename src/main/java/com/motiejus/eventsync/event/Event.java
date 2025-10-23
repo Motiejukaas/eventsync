@@ -22,6 +22,15 @@ public class Event {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "sentiment")
-    private String sentiment;
+    @Column(name = "positive_feedback_sentiment_count", nullable = false)
+    private int positiveFeedbackSentimentCount = 0;
+
+    @Column(name = "neutral_feedback_sentiment_count", nullable = false)
+    private int neutralFeedbackSentimentCount = 0;
+
+    @Column(name = "negative_feedback_sentiment_count", nullable = false)
+    private int negativeFeedbackSentimentCount = 0;
+
+    @Column(name = "feedback_sentiment_summary")
+    private String feedbackSentimentSummary;
 }
