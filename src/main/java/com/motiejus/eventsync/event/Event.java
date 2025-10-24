@@ -1,9 +1,11 @@
 package com.motiejus.eventsync.event;
 
+import com.motiejus.eventsync.feedback.Feedback;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -33,4 +35,7 @@ public class Event {
 
     @Column(name = "feedback_sentiment_summary")
     private String feedbackSentimentSummary;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> feedbacks;
 }

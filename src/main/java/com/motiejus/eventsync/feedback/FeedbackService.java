@@ -6,6 +6,7 @@ import com.motiejus.eventsync.event.EventService;
 import com.motiejus.eventsync.sentiment.SentimentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -24,20 +25,39 @@ public class FeedbackService {
         SentimentType sentiment = sentimentService.analyzeSentiment(feedbackRequestDTO.getMessage());
 
         Feedback feedback = mapToEntity(feedbackRequestDTO, sentiment, currentEvent);
+        currentEvent.getFeedbacks().add(feedback);
+        feedback.setEvent(currentEvent);
+
+        Feedback savedFeedback = feedbackRepository.save(feedback);
+        feedbackRepository.flush();
+
+        int positiveFeedbackSentimentCount = currentEvent.getPositiveFeedbackSentimentCount();
+        int neutralFeedbackSentimentCount = currentEvent.getNeutralFeedbackSentimentCount();
+        int negativeFeedbackSentimentCount = currentEvent.getNegativeFeedbackSentimentCount();
 
         switch (sentiment) {
             case POSITIVE -> currentEvent.setPositiveFeedbackSentimentCount(
-                    currentEvent.getPositiveFeedbackSentimentCount() + 1
+                    positiveFeedbackSentimentCount + 1
             );
             case NEUTRAL -> currentEvent.setNeutralFeedbackSentimentCount(
-                    currentEvent.getNeutralFeedbackSentimentCount() + 1
+                    neutralFeedbackSentimentCount + 1
             );
             case NEGATIVE -> currentEvent.setNegativeFeedbackSentimentCount(
-                    currentEvent.getNegativeFeedbackSentimentCount() + 1
+                    negativeFeedbackSentimentCount + 1
             );
         }
 
-        Feedback savedFeedback = feedbackRepository.save(feedback);
+        int total = positiveFeedbackSentimentCount +  neutralFeedbackSentimentCount + negativeFeedbackSentimentCount;
+
+        //alternative
+        //int triggerInterval = Math.max(1, (int) (5 * Math.log(total + 1)));
+
+        int triggerInterval = Math.max(1, (int)Math.sqrt(total));
+
+        if ((total % triggerInterval) == 0) {
+            currentEvent.setFeedbackSentimentSummary(sentimentService.summariseSentiments(currentEvent));
+        }
+
         return mapToDto(savedFeedback);
     }
 
