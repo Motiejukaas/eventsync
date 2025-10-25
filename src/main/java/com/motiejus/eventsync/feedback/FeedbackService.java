@@ -46,7 +46,7 @@ public class FeedbackService {
             );
         }
 
-        //+ 1 to account for the new feedback. Not calling the currentEvent again for efficiency.
+        // +1 to account for the new feedback. Not calling the currentEvent again for efficiency.
         int total = positiveFeedbackSentimentCount + neutralFeedbackSentimentCount + negativeFeedbackSentimentCount + 1;
 
         //alternative
