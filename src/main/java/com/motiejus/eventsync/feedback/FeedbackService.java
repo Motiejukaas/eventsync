@@ -6,7 +6,6 @@ import com.motiejus.eventsync.event.EventService;
 import com.motiejus.eventsync.sentiment.SentimentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -47,7 +46,8 @@ public class FeedbackService {
             );
         }
 
-        int total = positiveFeedbackSentimentCount +  neutralFeedbackSentimentCount + negativeFeedbackSentimentCount;
+        //+ 1 to account for the new feedback. Not calling the currentEvent again for efficiency.
+        int total = positiveFeedbackSentimentCount + neutralFeedbackSentimentCount + negativeFeedbackSentimentCount + 1;
 
         //alternative
         //int triggerInterval = Math.max(1, (int) (5 * Math.log(total + 1)));

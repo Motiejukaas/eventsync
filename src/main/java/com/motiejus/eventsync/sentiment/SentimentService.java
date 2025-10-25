@@ -7,8 +7,10 @@ import com.motiejus.eventsync.event.Event;
 import com.motiejus.eventsync.feedback.Feedback;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.models.ChatModel;
 import com.openai.models.responses.Response;
 import com.openai.models.responses.ResponseCreateParams;
+import com.openai.models.responses.ResponseOutputText;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.SQLOutput;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,7 +41,7 @@ public class SentimentService {
             "Write a single summary of the key points in 2–4 sentences (if there are very few reviews, 1–2 sentences). Output must be one plain paragraph only.\n" +
             "\n" +
             "User:\n" +
-            "You are given these reviews:";
+            "You are given these reviews: ";
 
     public SentimentService(@Value("${huggingface.token}") String hfToken, ObjectMapper objectMapper) {
         this.hfToken = hfToken;
@@ -118,21 +121,39 @@ public class SentimentService {
         }
     }
 
-    //TODO fix return
     //openai
     public String summariseSentimentsOpenAi(Event event) {
-        event.getFeedbacks();
-        //gets the api key from the environment variable
-        OpenAIClient client = OpenAIOkHttpClient.fromEnv();
+        try {
+            String allFeedbacks = event.getFeedbacks().stream()
+                    .map(Feedback::getMessage)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining("\n"));
 
-        ResponseCreateParams params = ResponseCreateParams.builder()
-                .input("")
-                .model("gpt-5-nano")
-                .build();
+            if (allFeedbacks.isBlank()) {
+                return "No feedbacks available to summarize.";
+            }
 
-        Response response = client.responses().create(params);
-        //return response.output().getFirst().content().get(0).text();
-        return null;
+            String prompt = systemPrompt + "\n" + allFeedbacks;
+
+            OpenAIClient client = OpenAIOkHttpClient.fromEnv();
+
+            ResponseCreateParams params = ResponseCreateParams.builder()
+                    .input(prompt)
+                    .model(ChatModel.GPT_5_NANO)
+                    .build();
+
+            Response response = client.responses().create(params);
+
+            return response.output().stream()
+                    .flatMap(item -> item.message().stream())
+                    .flatMap(msg -> msg.content().stream())
+                    .flatMap(c -> c.outputText().stream())
+                    .map(ResponseOutputText::text)
+                    .collect(Collectors.joining("\n")).trim();
+        } catch (Exception e) {
+            throw new RuntimeException("OpenAI summarization failed", e);
+        }
     }
+
 }
 
