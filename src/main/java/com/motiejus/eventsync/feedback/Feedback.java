@@ -19,7 +19,7 @@ public class Feedback {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID uuid;
 
-    @Column(name = "message")
+    @Column(name = "message", nullable = false, length = 5000)
     private String message;
 
     @Column(name = "sentiment")

@@ -21,7 +21,7 @@ public class Event {
     @Column(name = "title", nullable = false, length = 1000)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, length = 10000)
     private String description;
 
     @Column(name = "positive_feedback_sentiment_count", nullable = false)
@@ -33,7 +33,7 @@ public class Event {
     @Column(name = "negative_feedback_sentiment_count", nullable = false)
     private int negativeFeedbackSentimentCount = 0;
 
-    @Column(name = "feedback_sentiment_summary")
+    @Column(name = "feedback_sentiment_summary", length = 3000)
     private String feedbackSentimentSummary;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)

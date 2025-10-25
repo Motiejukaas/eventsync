@@ -10,6 +10,6 @@ import java.util.UUID;
 @Data
 public class FeedbackRequestDTO {
     @NotBlank(message = "Feedback message must not be empty.")
-    @Size(max = 10000, message = "Feedback message must not exceed 10000 characters.")
+    @Size(max = 5000, message = "Feedback message must not exceed 5000 characters.")
     private String message;
 }
