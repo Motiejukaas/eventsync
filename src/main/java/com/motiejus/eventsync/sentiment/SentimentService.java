@@ -107,13 +107,11 @@ public class SentimentService {
                 throw new RuntimeException("Hugging Face API error: " + response.statusCode());
 
             JsonNode root = objectMapper.readTree(response.body());
-            // extract text: response.output[0].content[0].text
-            String summary = root.path("choices").get(0)
+
+            return root.path("choices").get(0)
                     .path("message")
                     .path("content")
                     .asText();
-
-            return summary;
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to summarize feedbacks", e);
