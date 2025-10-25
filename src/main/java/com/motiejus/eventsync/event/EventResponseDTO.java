@@ -9,4 +9,8 @@ public class EventResponseDTO {
     private UUID id;
     private String title;
     private String description;
+    private int positiveFeedbackSentimentCount;
+    private int neutralFeedbackSentimentCount;
+    private int negativeFeedbackSentimentCount;
+    private String feedbackSentimentSummary;
 }

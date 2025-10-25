@@ -1,9 +1,12 @@
 package com.motiejus.eventsync.feedback;
 
+import com.motiejus.eventsync.common.enums.SentimentType;
 import com.motiejus.eventsync.event.Event;
 import com.motiejus.eventsync.event.EventService;
+import com.motiejus.eventsync.sentiment.SentimentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,11 +16,48 @@ import java.util.UUID;
 public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final EventService eventService;
+    private final SentimentService sentimentService;
 
-
+    @Transactional
     public FeedbackResponseDTO createFeedback(FeedbackRequestDTO feedbackRequestDTO, UUID eventId) {
-        Feedback feedback = mapToEntity(feedbackRequestDTO, eventService.getEventById(eventId));
+        Event currentEvent = eventService.getEventById(eventId);
+        SentimentType sentiment = sentimentService.analyzeSentiment(feedbackRequestDTO.getMessage());
+
+        Feedback feedback = mapToEntity(feedbackRequestDTO, sentiment, currentEvent);
+        currentEvent.getFeedbacks().add(feedback);
+        feedback.setEvent(currentEvent);
+
         Feedback savedFeedback = feedbackRepository.save(feedback);
+        feedbackRepository.flush();
+
+        int positiveFeedbackSentimentCount = currentEvent.getPositiveFeedbackSentimentCount();
+        int neutralFeedbackSentimentCount = currentEvent.getNeutralFeedbackSentimentCount();
+        int negativeFeedbackSentimentCount = currentEvent.getNegativeFeedbackSentimentCount();
+
+        switch (sentiment) {
+            case POSITIVE -> currentEvent.setPositiveFeedbackSentimentCount(
+                    positiveFeedbackSentimentCount + 1
+            );
+            case NEUTRAL -> currentEvent.setNeutralFeedbackSentimentCount(
+                    neutralFeedbackSentimentCount + 1
+            );
+            case NEGATIVE -> currentEvent.setNegativeFeedbackSentimentCount(
+                    negativeFeedbackSentimentCount + 1
+            );
+        }
+
+        // +1 to account for the new feedback. Not calling the currentEvent again for efficiency.
+        int total = positiveFeedbackSentimentCount + neutralFeedbackSentimentCount + negativeFeedbackSentimentCount + 1;
+
+        //alternative
+        //int triggerInterval = Math.max(1, (int) (5 * Math.log(total + 1)));
+
+        int triggerInterval = Math.max(1, (int)Math.sqrt(total));
+
+        if ((total % triggerInterval) == 0) {
+            currentEvent.setFeedbackSentimentSummary(sentimentService.summariseSentiments(currentEvent));
+        }
+
         return mapToDto(savedFeedback);
     }
 
@@ -28,11 +68,11 @@ public class FeedbackService {
     }
 
     //Mappers
-    private Feedback mapToEntity(FeedbackRequestDTO feedbackRequestDTO, Event event) {
+    private Feedback mapToEntity(FeedbackRequestDTO feedbackRequestDTO, SentimentType sentiment, Event event) {
         Feedback feedback = new Feedback();
         feedback.setMessage(feedbackRequestDTO.getMessage());
+        feedback.setSentiment(sentiment);
         feedback.setEvent(event);
-
         return feedback;
     }
 
@@ -40,9 +80,9 @@ public class FeedbackService {
         FeedbackResponseDTO feedbackResponseDTO = new FeedbackResponseDTO();
         feedbackResponseDTO.setId(feedback.getUuid());
         feedbackResponseDTO.setMessage(feedback.getMessage());
+        feedbackResponseDTO.setSentiment(feedback.getSentiment());
         feedbackResponseDTO.setCreatedAt(feedback.getCreatedAt());
         feedbackResponseDTO.setEventId(feedback.getEvent().getId());
-
         return feedbackResponseDTO;
     }
 }

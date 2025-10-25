@@ -43,9 +43,17 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).body(feedbackResponseDTO);
     }
 
-    @Operation(summary = "Get sentiment breakdown")
+    @Operation(summary = "Get sentiment breakdown (counts and percentages)")
     @GetMapping("/{eventId}/summary")
-    public ResponseEntity<FeedbackResponseDTO> getSentimentBreakdown(@PathVariable UUID eventId) {
-        return null;
+    public ResponseEntity<EventSentimentBreakdownDTO> getSentimentBreakdown(@PathVariable UUID eventId) {
+        EventSentimentBreakdownDTO breakdown = eventService.getSentimentBreakdown(eventId);
+        return ResponseEntity.status(HttpStatus.OK).body(breakdown);
+    }
+
+    @Operation(summary = "Get AI-generated feedback summary")
+    @GetMapping("/{eventId}/summary/ai")
+    public ResponseEntity<String> getAISummary(@PathVariable UUID eventId) {
+        String summary = eventService.getAISummary(eventId);
+        return ResponseEntity.status(HttpStatus.OK).body(summary);
     }
 }

@@ -11,5 +11,6 @@ public class EventRequestDTO {
     private String title;
 
     @NotBlank(message = "Event description must not be empty.")
+    @Size(max = 10000, message = "Event description must not exceed 10000 characters.")
     private String description;
 }
