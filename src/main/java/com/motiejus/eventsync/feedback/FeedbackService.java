@@ -30,25 +30,31 @@ public class FeedbackService {
         Feedback savedFeedback = feedbackRepository.save(feedback);
         feedbackRepository.flush();
 
-        int positiveFeedbackSentimentCount = currentEvent.getPositiveFeedbackSentimentCount();
-        int neutralFeedbackSentimentCount = currentEvent.getNeutralFeedbackSentimentCount();
-        int negativeFeedbackSentimentCount = currentEvent.getNegativeFeedbackSentimentCount();
+        //For efficiency. To not have multiple currentEvent calls.
+        int positiveFeedbackCount = currentEvent.getPositiveFeedbackSentimentCount();
+        int neutralFeedbackCount = currentEvent.getNeutralFeedbackSentimentCount();
+        int negativeFeedbackCount = currentEvent.getNegativeFeedbackSentimentCount();
 
         switch (sentiment) {
             case POSITIVE -> currentEvent.setPositiveFeedbackSentimentCount(
-                    positiveFeedbackSentimentCount + 1
+                    positiveFeedbackCount + 1
             );
             case NEUTRAL -> currentEvent.setNeutralFeedbackSentimentCount(
-                    neutralFeedbackSentimentCount + 1
+                    neutralFeedbackCount + 1
             );
             case NEGATIVE -> currentEvent.setNegativeFeedbackSentimentCount(
-                    negativeFeedbackSentimentCount + 1
+                    negativeFeedbackCount + 1
             );
         }
 
-        // +1 to account for the new feedback. Not calling the currentEvent again for efficiency.
-        int total = positiveFeedbackSentimentCount + neutralFeedbackSentimentCount + negativeFeedbackSentimentCount + 1;
+        // +1 to account for the new feedback
+        triggerSummary(positiveFeedbackCount + neutralFeedbackCount + negativeFeedbackCount + 1,
+                currentEvent);
 
+        return mapToDto(savedFeedback);
+    }
+
+    private void triggerSummary(int total, Event currentEvent) {
         //alternative
         //int triggerInterval = Math.max(1, (int) (5 * Math.log(total + 1)));
 
@@ -57,8 +63,6 @@ public class FeedbackService {
         if ((total % triggerInterval) == 0) {
             currentEvent.setFeedbackSentimentSummary(sentimentService.summariseSentiments(currentEvent));
         }
-
-        return mapToDto(savedFeedback);
     }
 
     public List<FeedbackResponseDTO> getFeedbacks(UUID eventId) {

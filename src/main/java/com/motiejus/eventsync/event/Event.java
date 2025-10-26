@@ -34,7 +34,7 @@ public class Event {
     private int negativeFeedbackSentimentCount = 0;
 
     @Column(name = "feedback_sentiment_summary", length = 3000)
-    private String feedbackSentimentSummary;
+    private String feedbackSentimentSummary = "No feedback has been provided.";
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Feedback> feedbacks;
