@@ -3,6 +3,7 @@ package com.motiejus.eventsync.event;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,17 @@ public class EventService {
     public Event getEventById(UUID eventId) {
         return eventRepository.findById(eventId).
                 orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+    }
+
+    public Event getEventWithFeedbacksById(UUID eventId) {
+        return eventRepository.getEventWithFeedbacksById(eventId).
+                orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+    }
+
+    @Transactional
+    public void updateFeedbackSummary(Event event, String summary) {
+        event.setFeedbackSentimentSummary(summary);
+        eventRepository.save(event);
     }
 
     public EventSentimentBreakdownDTO getSentimentBreakdown(UUID eventId) {
