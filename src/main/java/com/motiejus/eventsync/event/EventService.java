@@ -29,13 +29,13 @@ public class EventService {
     }
 
     public Event getEventById(UUID eventId) {
-        return eventRepository.findById(eventId).
-                orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
     }
 
     public Event getEventWithFeedbacksById(UUID eventId) {
-        return eventRepository.getEventWithFeedbacksById(eventId).
-                orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+        return eventRepository.getEventWithFeedbacksById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
     }
 
     @Transactional
