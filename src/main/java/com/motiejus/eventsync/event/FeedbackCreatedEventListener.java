@@ -21,7 +21,7 @@ public class FeedbackCreatedEventListener {
         Event event = eventService.getEventWithFeedbacksById(publishedEvent.getEventId());
 
         int total = event.getPositiveFeedbackSentimentCount() +
-                    event.getNegativeFeedbackSentimentCount() +
+                    event.getNeutralFeedbackSentimentCount() +
                     event.getNegativeFeedbackSentimentCount();
 
         //alternative

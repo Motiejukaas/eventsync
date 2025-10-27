@@ -10,7 +10,6 @@ public class FeedbackCreatedEvent {
     private final UUID eventId;
 
     public FeedbackCreatedEvent(UUID eventId) {
-        //super(source);
         this.eventId = eventId;
     }
 }
