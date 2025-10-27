@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +31,9 @@ class FeedbackServiceTest {
 
     @Mock
     private SentimentService sentimentService;
+
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private FeedbackService feedbackService;
@@ -64,24 +68,24 @@ class FeedbackServiceTest {
         verify(eventService).getEventById(eventId);
         verify(sentimentService).analyzeSentiment(request.getMessage());
         verify(feedbackRepository).save(any(Feedback.class));
-        verify(feedbackRepository).flush();
     }
 
     @Test
-    void createFeedback_ShouldTriggerSummary_WhenIntervalMatches() {
+    void createFeedback_ShouldSaveFeedbackAndPublishEvent() {
         FeedbackRequestDTO request = new FeedbackRequestDTO();
         request.setMessage("Amazing!");
         when(eventService.getEventById(eventId)).thenReturn(event);
-        when(sentimentService.analyzeSentiment(anyString())).thenReturn(SentimentType.POSITIVE);
+        when(sentimentService.analyzeSentiment(request.getMessage())).thenReturn(SentimentType.POSITIVE);
         when(feedbackRepository.save(any(Feedback.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(sentimentService.summariseSentiments(event)).thenReturn("Summary generated");
 
         FeedbackResponseDTO response = feedbackService.createFeedback(request, eventId);
 
         assertNotNull(response);
+        assertEquals(request.getMessage(), response.getMessage());
         assertEquals(SentimentType.POSITIVE, response.getSentiment());
-        assertEquals("Summary generated", event.getFeedbackSentimentSummary());
-        verify(sentimentService).summariseSentiments(event);
+        assertEquals(eventId, response.getEventId());
+        verify(feedbackRepository).save(any(Feedback.class));
+        verify(applicationEventPublisher).publishEvent(any(FeedbackCreatedEvent.class));
     }
 
     @Test
