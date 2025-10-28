@@ -142,13 +142,12 @@ These must be set:
 OPENAI_API_KEY	OpenAI API key  
 HF_TOKEN Hugging Face API token
 
-## Swagger & Testing
+## Swagger
 
 Access Swagger UI
 http://localhost:8080/swagger-ui.html
 
-Once deployed, Swagger UI is accessible at:
-https://event-sync-server-140350866035.europe-north2.run.app/swagger-ui.html
+Once deployed, Swagger UI is not accessible due to disabled CORS.
 
 ## Development Notes
 
