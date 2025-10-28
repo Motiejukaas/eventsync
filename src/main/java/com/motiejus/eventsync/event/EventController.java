@@ -35,7 +35,6 @@ public class EventController {
         return ResponseEntity.noContent().build();
     }
 
-
     @Operation(summary = "List all events")
     @GetMapping
     public ResponseEntity<List<EventResponseDTO>> getAllEvents() {
