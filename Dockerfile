@@ -51,7 +51,7 @@ RUN java -Djarmode=layertools -jar target/app.jar extract --destination target/e
 # image from the install or build stage where the necessary files are copied
 # from the install stage.
 #
-# The example below uses eclipse-turmin's JRE image as the foundation for running the app.
+# The example below uses eclipse-temurin's JRE image as the foundation for running the app.
 # By specifying the "25-jre-jammy" tag, it will also use whatever happens to be the
 # most recent version of that tag when you build your Dockerfile.
 # If reproducibility is important, consider using a specific digest SHA, like
