@@ -26,7 +26,6 @@ public class FeedbackService {
         SentimentType sentiment = sentimentService.analyzeSentiment(feedbackRequestDTO.getMessage());
 
         Feedback feedback = mapToEntity(feedbackRequestDTO, sentiment, currentEvent);
-        feedback.setEvent(currentEvent);
 
         Feedback savedFeedback = feedbackRepository.save(feedback);
 

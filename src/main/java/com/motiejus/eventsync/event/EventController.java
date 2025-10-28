@@ -28,6 +28,14 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventResponseDTO);
     }
 
+    @Operation(summary = "Delete event")
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable UUID eventId) {
+        eventService.deleteEvent(eventId);
+        return ResponseEntity.noContent().build();
+    }
+
+
     @Operation(summary = "List all events")
     @GetMapping
     public ResponseEntity<List<EventResponseDTO>> getAllEvents() {

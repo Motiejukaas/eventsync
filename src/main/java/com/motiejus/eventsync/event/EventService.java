@@ -20,6 +20,14 @@ public class EventService {
         return mapToDto(savedEvent);
     }
 
+
+    public void deleteEvent(UUID eventId) {
+        Event event = eventRepository.findById(eventId)
+                        .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+
+        eventRepository.delete(event);
+    }
+
     public List<EventResponseDTO> getEvents() {
         List<Event> events = eventRepository.findAll();
 
