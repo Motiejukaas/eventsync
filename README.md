@@ -110,11 +110,45 @@ Returns all the event's feedbacks.
 
 - Java 25
 - Maven
+- Node.js
+- npm
 - Docker (optional)
 
-`mvn spring-boot:run`
+### Environment Variables
+
+These must be set:
+
+OPENAI_API_KEY	OpenAI API key  
+HF_TOKEN Hugging Face API token
+
+Backend CORS origin (mapped from Spring property `app.cors.allowed-origin`):
+
+- `APP_CORS_ALLOWED_ORIGIN` — the allowed frontend origin (e.g., `https://example.com`).
+
+Additional notes:
+- The frontend build can embed an API endpoint via `VITE_API_URL`. In local Docker Compose it is baked as `http://localhost:8080`. In other deployments (e.g., Cloud Run) set it to the public backend URL.
+
+
+### Backend development
+
+```powershell
+mvn spring-boot:run
+```
 
 The app starts on: http://localhost:8080
+
+### Frontend development (Vite)
+
+For local, hot-reload frontend development without Docker:
+
+```powershell
+cd eventsync-frontend
+npm install
+npm run dev
+```
+
+The dev server runs on http://localhost:5173 and, by default, the app will call the backend at http://localhost:8080.
+
 
 ## Docker
 
@@ -131,8 +165,9 @@ URLs:
 - Backend API: http://localhost:8080
 
 Notes:
-- Frontend calls the API using a relative base URL `/api` in production builds. The nginx in the frontend container proxies `/api/*` to the backend.
-- CORS for local dev is already set to `http://localhost:5173` via `APP_CORS_ALLOWED_ORIGIN` in `compose.yaml`.
+- Frontend uses an absolute API base URL baked at build time via `VITE_API_URL` (see `compose.yaml`).
+- For local Docker Compose, `VITE_API_URL` is set to `http://localhost:8080` so the browser calls the backend directly.
+- CORS for local dev is set to `http://localhost:5173` via `APP_CORS_ALLOWED_ORIGIN` in `compose.yaml`.
 
 Stop containers:
 
@@ -150,21 +185,10 @@ docker build -t eventsync-server .
 docker build -t eventsync-frontend ./eventsync-frontend
 ```
 
-## Environment Variables
-
-These must be set:
-
-OPENAI_API_KEY	OpenAI API key  
-HF_TOKEN Hugging Face API token
-
-Backend CORS origin (mapped from Spring property `app.cors.allowed-origin`):
-
-- `APP_CORS_ALLOWED_ORIGIN` — the allowed frontend origin (e.g., `https://app.example.com`).
-
 ## Swagger
 
 Access Swagger UI
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui/index.html
 
 Once deployed, Swagger UI is not accessible due to disabled CORS.
 
