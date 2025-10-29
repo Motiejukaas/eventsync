@@ -7,4 +7,15 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - HF_TOKEN=${HF_TOKEN}
-      - APP_CORS_ALLOWED-ORIGIN=http://localhost:5173
+      - APP_CORS_ALLOWED_ORIGIN=http://localhost:5173
+  frontend:
+    build:
+      context: ./eventsync-frontend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=http://server:8080
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
