@@ -3,9 +3,11 @@
 EventSync is a Spring Boot REST API for managing events and collecting user feedback with AI-powered sentiment analysis and summarization.  
 It integrates with **OpenAI** (deprecated) and **Hugging Face** APIs to analyze and summarize event feedback automatically.
 
+The repository also contains a React + Vite frontend in `eventsync-frontend/` which is built and served by nginx in production.
+
 ---
 ## Deployment
-Currently available at: https://event-sync-server-140350866035.europe-north2.run.app
+Currently available at: https://eventsync-frontend-140350866035.europe-north2.run.app
 
 ## Features
 - Create, list, and delete events
@@ -115,25 +117,38 @@ Returns all the event's feedbacks.
 The app starts on: http://localhost:8080
 
 ## Docker
-### Building and running your application
 
-When you're ready, start your application by running:
-`docker compose up --build`.
+### Full‑stack (frontend + backend) with Docker Compose (local)
 
-Your application will be available at http://localhost:8080.
+Run both services:
 
-### Deploying your application to the cloud
+```powershell
+docker compose up --build
+```
 
-First, build your image `docker build -t event-sync .`.
-If your cloud uses a different CPU architecture than your development
-machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
-you'll want to build the image for that platform, e.g.:
-`docker build --platform=linux/amd64 -t event-sync .`.
+URLs:
+- Frontend: http://localhost:5173 (served by nginx)
+- Backend API: http://localhost:8080
 
-Then, push it to your registry, e.g. `docker push myregistry.com/event-sync`.
+Notes:
+- Frontend calls the API using a relative base URL `/api` in production builds. The nginx in the frontend container proxies `/api/*` to the backend.
+- CORS for local dev is already set to `http://localhost:5173` via `APP_CORS_ALLOWED_ORIGIN` in `compose.yaml`.
 
-Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
-docs for more detail on building and pushing.
+Stop containers:
+
+```powershell
+docker compose down
+```
+
+### Building images separately
+
+```powershell
+# Backend
+docker build -t eventsync-server .
+
+# Frontend (production build)
+docker build -t eventsync-frontend ./eventsync-frontend
+```
 
 ## Environment Variables
 
@@ -141,6 +156,10 @@ These must be set:
 
 OPENAI_API_KEY	OpenAI API key  
 HF_TOKEN Hugging Face API token
+
+Backend CORS origin (mapped from Spring property `app.cors.allowed-origin`):
+
+- `APP_CORS_ALLOWED_ORIGIN` — the allowed frontend origin (e.g., `https://app.example.com`).
 
 ## Swagger
 

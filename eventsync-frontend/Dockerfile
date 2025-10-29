@@ -27,9 +27,14 @@ FROM nginx:alpine AS final
 # Copy built static files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Include a small nginx config that supports SPA routing
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Template nginx config that references ${PORT}
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-EXPOSE 80
+# Entry point renders the template with $PORT and starts nginx
+ENV PORT=8080
+EXPOSE 8080
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
