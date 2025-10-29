@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../api";
 import type {
@@ -21,7 +21,7 @@ export default function EventDetail() {
     const [feedbacks, setFeedbacks] = useState<FeedbackResponseDTO[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const load = async () => {
+    const load = useCallback(async () => {
         if (!id) return;
         setLoading(true);
         const [s, f] = await Promise.all([
@@ -41,11 +41,11 @@ export default function EventDetail() {
             setAiSummary("");
         }
         setLoading(false);
-    };
+    }, [id]);
 
     useEffect(() => {
         load();
-    }, [id]);
+    }, [load]);
 
     const onSubmitFeedback = async (payload: FeedbackRequestDTO) => {
         await api.post(`/events/${id}/feedback`, payload);

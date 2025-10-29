@@ -17,9 +17,9 @@ export default function EventList() {
     useEffect(() => {
         load();
         const handler = () => load();
-        window.addEventListener("events:reload", handler as any);
+        window.addEventListener("events:reload", handler);
         return () =>
-            window.removeEventListener("events:reload", handler as any);
+            window.removeEventListener("events:reload", handler);
     }, []);
 
     if (loading)
