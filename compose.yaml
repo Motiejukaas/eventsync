@@ -12,10 +12,13 @@ services:
     build:
       context: ./eventsync-frontend
       dockerfile: Dockerfile
+      args:
+        # Bake the API base URL for local dev so the browser calls the host-mapped backend
+        VITE_API_URL: http://localhost:8080
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=http://server:8080
     ports:
-      - "5173:80"
+      # nginx listens on $PORT (defaults to 8080 in the container via entrypoint), map host 5173 -> container 8080
+      - "5173:8080"
     depends_on:
       - server
