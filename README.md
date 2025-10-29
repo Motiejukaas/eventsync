@@ -3,9 +3,11 @@
 EventSync is a Spring Boot REST API for managing events and collecting user feedback with AI-powered sentiment analysis and summarization.  
 It integrates with **OpenAI** (deprecated) and **Hugging Face** APIs to analyze and summarize event feedback automatically.
 
+The repository also contains a React + Vite frontend in `eventsync-frontend/` which is built and served by nginx in production.
+
 ---
 ## Deployment
-Currently available at: https://event-sync-server-140350866035.europe-north2.run.app
+Currently available at: https://eventsync-frontend-140350866035.europe-north2.run.app
 
 ## Features
 - Create, list, and delete events
@@ -108,44 +110,85 @@ Returns all the event's feedbacks.
 
 - Java 25
 - Maven
+- Node.js
+- npm
 - Docker (optional)
 
-`mvn spring-boot:run`
-
-The app starts on: http://localhost:8080
-
-## Docker
-### Building and running your application
-
-When you're ready, start your application by running:
-`docker compose up --build`.
-
-Your application will be available at http://localhost:8080.
-
-### Deploying your application to the cloud
-
-First, build your image `docker build -t event-sync .`.
-If your cloud uses a different CPU architecture than your development
-machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
-you'll want to build the image for that platform, e.g.:
-`docker build --platform=linux/amd64 -t event-sync .`.
-
-Then, push it to your registry, e.g. `docker push myregistry.com/event-sync`.
-
-Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
-docs for more detail on building and pushing.
-
-## Environment Variables
+### Environment Variables
 
 These must be set:
 
 OPENAI_API_KEY	OpenAI API key  
 HF_TOKEN Hugging Face API token
 
+Backend CORS origin (mapped from Spring property `app.cors.allowed-origin`):
+
+- `APP_CORS_ALLOWED_ORIGIN` — the allowed frontend origin (e.g., `https://example.com`).
+
+Additional notes:
+- The frontend build can embed an API endpoint via `VITE_API_URL`. In local Docker Compose it is baked as `http://localhost:8080`. In other deployments (e.g., Cloud Run) set it to the public backend URL.
+
+
+### Backend development
+
+```powershell
+mvn spring-boot:run
+```
+
+The app starts on: http://localhost:8080
+
+### Frontend development (Vite)
+
+For local, hot-reload frontend development without Docker:
+
+```powershell
+cd eventsync-frontend
+npm install
+npm run dev
+```
+
+The dev server runs on http://localhost:5173 and, by default, the app will call the backend at http://localhost:8080.
+
+
+## Docker
+
+### Full‑stack (frontend + backend) with Docker Compose (local)
+
+Run both services:
+
+```powershell
+docker compose up --build
+```
+
+URLs:
+- Frontend: http://localhost:5173 (served by nginx)
+- Backend API: http://localhost:8080
+
+Notes:
+- Frontend uses an absolute API base URL baked at build time via `VITE_API_URL` (see `compose.yaml`).
+- For local Docker Compose, `VITE_API_URL` is set to `http://localhost:8080` so the browser calls the backend directly.
+- CORS for local dev is set to `http://localhost:5173` via `APP_CORS_ALLOWED_ORIGIN` in `compose.yaml`.
+
+Stop containers:
+
+```powershell
+docker compose down
+```
+
+### Building images separately
+
+```powershell
+# Backend
+docker build -t eventsync-server .
+
+# Frontend (production build)
+docker build -t eventsync-frontend ./eventsync-frontend
+```
+
 ## Swagger
 
 Access Swagger UI
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui/index.html
 
 Once deployed, Swagger UI is not accessible due to disabled CORS.
 

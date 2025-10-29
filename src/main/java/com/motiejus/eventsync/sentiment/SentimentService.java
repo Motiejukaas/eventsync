@@ -36,8 +36,8 @@ public class SentimentService {
     private final ObjectMapper objectMapper;
 
     private static final String systemPrompt = "System:\n" +
-            "Summarize event reviews into a neutral, concise paragraph highlighting the main positives and negatives. Do not invent facts. No lists, tables, headings, quotes, emojis, or metadata.\n" +
-            "Write a single summary of the key points in 2–4 sentences (if there are very few reviews, 1–2 sentences). Output must be one plain paragraph only.\n" +
+            "Summarize event reviews into a neutral, concise paragraph highlighting the main positives and negatives. Do not invent facts. If the reviews don't mention particular positives and negatives, mention that but do not hallucinate. No lists, tables, headings, quotes, emojis, or metadata.\n" +
+            "Write a single summary of the key points in 2-4 sentences (if there are very few reviews, 1-2 sentences). Output must be one plain paragraph only.\n" +
             "\n" +
             "User:\n" +
             "You are given these reviews: ";
