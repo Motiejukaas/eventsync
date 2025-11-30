@@ -6,8 +6,6 @@ It integrates with **OpenAI** (deprecated) and **Hugging Face** APIs to analyze 
 The repository also contains a React + Vite frontend in `eventsync-frontend/` which is built and served by nginx in production.
 
 ---
-## Deployment
-Currently available at: https://eventsync-frontend-140350866035.europe-north2.run.app
 
 ## Features
 - Create, list, and delete events
